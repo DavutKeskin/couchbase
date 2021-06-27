@@ -1,0 +1,22 @@
+---
+apiVersion: argoproj.io/v1alpha1
+kind: Application
+metadata:
+  name: couchbase-opeartor
+  namespace: argocd
+spec:
+  destination:
+    namespace: couchbase
+  project: default
+  source:
+    repoURL: "https://couchbase-partners.github.io/helm-charts/"
+    targetRevision: "2.1.0"
+    chart: couchbase-operator
+    helm:
+      values: |
+        install:
+          couchbaseOperator: true
+          admissionController: false
+          couchbaseCluster: false
+          syncGateway: false
+

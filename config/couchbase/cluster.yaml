@@ -1,0 +1,96 @@
+apiVersion: couchbase.com/v2
+kind: CouchbaseCluster
+metadata:
+  labels:
+  name: couchbase
+spec:
+  buckets:
+    managed: true
+    selector:
+      matchLabels:
+        cluster: couchbase
+  cluster:
+    analyticsServiceMemoryQuota: 1Gi
+    autoCompaction:
+      databaseFragmentationThreshold:
+        percent: 30
+        size: 1Gi
+      #parallelCompaction: false
+      timeWindow: {}
+      tombstonePurgeInterval: 72h0m0s
+      viewFragmentationThreshold:
+        percent: 30
+        size: 1Gi
+    autoFailoverMaxCount: 3
+    autoFailoverOnDataDiskIssues: true
+    autoFailoverOnDataDiskIssuesTimePeriod: 2m0s
+    autoFailoverTimeout: 2m0s
+    dataServiceMemoryQuota: 1000Mi
+    eventingServiceMemoryQuota: 1000Mi
+    indexServiceMemoryQuota: 800Mi
+    indexStorageSetting: memory_optimized
+    searchServiceMemoryQuota: 1000Mi
+  #enablePreviewScaling: false
+  #hibernate: false
+  hibernationStrategy: Immediate
+  image: "couchbase/server:6.6.0"
+  #logRetentionCount: 20
+  #logRetentionTime: 604800s
+  logging:
+    logRetentionCount: 20
+    logRetentionTime: 604800s
+  monitoring:
+    prometheus:
+      #enabled: false
+      image: "couchbase/exporter:1.0.3"
+  networking:
+    adminConsoleServiceType: NodePort
+    adminConsoleServices:
+      - data
+    exposeAdminConsole: true
+    exposedFeatureServiceType: NodePort
+    exposedFeatureTrafficPolicy: Local
+    exposedFeatures:
+      - client
+      - xdcr
+  recoveryPolicy: PrioritizeDataIntegrity
+  security:
+    adminSecret: couchbase-admin
+    rbac:
+      managed: true
+      selector:
+        matchLabels:
+          cluster: couchbase
+  securityContext:
+    fsGroup: 1000
+    runAsNonRoot: false
+    runAsUser: 0
+  servers:
+    - name: default
+      pod:
+        metadata: {}
+        spec:
+          containers: []
+      resources: {}
+      #serverGroups: []
+      services:
+        - data
+        - index
+        - query
+        - search
+        #- analytics
+        - eventing
+      size: 1
+      volumeMounts:
+        default: couchbase
+  upgradeStrategy: RollingUpgrade
+  volumeClaimTemplates:
+    - metadata:
+        name: couchbase
+      spec:
+        storageClassName: gp2
+        resources:
+          requests:
+            storage: 1Gi
+  xdcr: {}
+  #  managed: false
