@@ -7,9 +7,11 @@ metadata:
 spec:
   destination:
     namespace: couchbase
+    server: https://kubernetes.default.svc
+
   project: default
   source:
-    repoURL: ""
+    repoURL: "https://github.com/DavutKeskin/couchbase.git"
     path: config/couchbase
     targetRevision: master
 ---
